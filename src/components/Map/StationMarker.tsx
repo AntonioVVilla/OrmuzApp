@@ -17,8 +17,8 @@ export default function StationMarker({
   onPress,
 }: Props) {
   const fuel = station.prices.find(p => p.fuelType === selectedFuelLabel);
-  const price = fuel?.price ?? 0;
-  const bgColor = station.color ?? '#888888';
+  const hasPrice = fuel !== undefined && fuel.price > 0;
+  const bgColor = hasPrice ? (station.color ?? '#888888') : '#B0B0B0';
   const textColor = contrastTextColor(bgColor);
 
   const handlePress = useCallback(() => {
@@ -35,7 +35,7 @@ export default function StationMarker({
         style={styles.touchable}>
         <View style={[styles.bubble, {backgroundColor: bgColor}]}>
           <Text style={[styles.priceText, {color: textColor}]}>
-            {formatMarkerPrice(price)}
+            {hasPrice ? formatMarkerPrice(fuel.price) : 'N/D'}
           </Text>
         </View>
         <View style={[styles.arrow, {borderTopColor: bgColor}]} />

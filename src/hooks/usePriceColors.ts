@@ -31,15 +31,14 @@ export function usePriceColors(
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
 
-    return stations.map(station => {
-      const price = pricesMap.get(station.id);
-      if (price === undefined) {
-        return station;
-      }
-      return {
-        ...station,
-        color: priceToColor(price, minPrice, maxPrice),
-      };
-    });
+    return stations
+      .filter(station => pricesMap.has(station.id))
+      .map(station => {
+        const price = pricesMap.get(station.id)!;
+        return {
+          ...station,
+          color: priceToColor(price, minPrice, maxPrice),
+        };
+      });
   }, [stations, selectedFuelLabel]);
 }

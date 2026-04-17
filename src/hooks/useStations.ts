@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback, useMemo} from 'react';
+import {useEffect, useState, useCallback, useMemo, useRef} from 'react';
 import {fetchStationsByProvince} from '../services/api';
 import {parseAllStations} from '../services/parser';
 import {filterByProximity} from '../services/geo';
@@ -28,12 +28,18 @@ export function useStations(
     lastUpdate: null,
   });
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const provinceId = useMemo(
     () => getProvinceId(location.latitude, location.longitude),
     [location.latitude, location.longitude],
   );
 
   const loadStations = useCallback(async () => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setState(prev => ({...prev, loading: true, error: null}));
 
     try {
@@ -42,7 +48,7 @@ export function useStations(
 
       if (!stations) {
         // Fetch only this province (~500-700 stations instead of 12,000)
-        const response = await fetchStationsByProvince(provinceId);
+        const response = await fetchStationsByProvince(provinceId, controller.signal);
         stations = parseAllStations(response.ListaEESSPrecio);
         await cacheStations(provinceId, stations);
       }
@@ -54,6 +60,10 @@ export function useStations(
         lastUpdate: new Date(),
       }));
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
+
       // If fetch fails, try cache regardless of TTL
       try {
         const cached = await getCachedStationsIgnoreTTL(provinceId);
@@ -103,6 +113,12 @@ export function useStations(
   useEffect(() => {
     loadStations();
   }, [loadStations]);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   return {
     ...state,

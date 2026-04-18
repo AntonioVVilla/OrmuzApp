@@ -1,0 +1,61 @@
+{
+  "app": {
+    "defaultFallbackError": "Ha ocurrido un error inesperado. Vuelve a intentarlo."
+  },
+  "permission": {
+    "title": "Ubicación",
+    "message": "Ormuz necesita acceso a tu ubicación para mostrar gasolineras cercanas.",
+    "positive": "Permitir",
+    "negative": "Cancelar"
+  },
+  "errors": {
+    "title": "Algo no salió bien",
+    "retry": "Reintentar",
+    "location": "Error de ubicación: {{detail}}",
+    "permissionDenied": "Permiso de ubicación denegado. Mostrando Madrid por defecto.",
+    "offlineStale": "Sin conexión. Mostrando datos en caché.",
+    "fetchFailed": "Error al cargar las gasolineras.",
+    "network": "No hemos podido conectar con el servicio. Revisa tu conexión.",
+    "parse": "Los datos recibidos no son válidos. Inténtalo más tarde.",
+    "unknown": "Se ha producido un problema. Vuelve a intentarlo."
+  },
+  "loading": {
+    "stations": "Cargando gasolineras..."
+  },
+  "searchRadius": {
+    "label": "Radio",
+    "unit": "km",
+    "decrease": "Reducir radio de búsqueda",
+    "increase": "Aumentar radio de búsqueda",
+    "value": "Radio actual: {{radius}} kilómetros"
+  },
+  "fuel": {
+    "selector": "Selector de tipo de carburante",
+    "chip": "Carburante {{label}}",
+    "chipSelected": "Carburante {{label}} seleccionado"
+  },
+  "stationDetail": {
+    "prices": "Precios",
+    "navigate": "Cómo llegar",
+    "close": "Cerrar",
+    "schedule": "Horario",
+    "distance": "A {{distance}}"
+  },
+  "map": {
+    "attribution": "© OpenStreetMap · OpenFreeMap",
+    "marker": "Gasolinera {{name}}, {{fuel}} a {{price}} €/L, a {{distance}}"
+  },
+  "emptyState": {
+    "title": "Sin gasolineras cerca",
+    "message": "No hay estaciones para este carburante dentro del radio actual.",
+    "increaseRadius": "Aumentar radio",
+    "retry": "Reintentar"
+  },
+  "offlineBadge": {
+    "label": "Sin conexión"
+  },
+  "errorBanner": {
+    "dismiss": "OK",
+    "dismissLabel": "Cerrar aviso"
+  }
+}

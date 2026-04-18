@@ -55,9 +55,35 @@ react {
 }
 
 /**
- * Set this to true to Run Proguard on Release builds to minify the Java bytecode.
+ * Run R8/ProGuard on release builds to shrink and obfuscate the
+ * Java bytecode. Override with -PenableProguardInReleaseBuilds=false
+ * from the command line if needed for debugging.
  */
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds =
+    project.hasProperty("enableProguardInReleaseBuilds")
+        ? project.getProperty("enableProguardInReleaseBuilds").toBoolean()
+        : true
+
+/**
+ * Release signing. Expected to be supplied via ~/.gradle/gradle.properties
+ * or environment variables in CI:
+ *
+ *   RELEASE_STORE_FILE      (absolute path to a .jks/.keystore)
+ *   RELEASE_STORE_PASSWORD
+ *   RELEASE_KEY_ALIAS
+ *   RELEASE_KEY_PASSWORD
+ *
+ * If any of those are missing, we fall back to the debug keystore so
+ * `assembleRelease` still succeeds locally, but we log a warning so
+ * nobody accidentally ships an unsigned artifact.
+ */
+def releaseStoreFile = System.getenv("RELEASE_STORE_FILE") ?: project.findProperty("RELEASE_STORE_FILE")
+def releaseStorePassword = System.getenv("RELEASE_STORE_PASSWORD") ?: project.findProperty("RELEASE_STORE_PASSWORD")
+def releaseKeyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: project.findProperty("RELEASE_KEY_ALIAS")
+def releaseKeyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: project.findProperty("RELEASE_KEY_PASSWORD")
+def hasReleaseSigning =
+    releaseStoreFile != null && releaseStorePassword != null &&
+    releaseKeyAlias != null && releaseKeyPassword != null
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -92,18 +118,45 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig hasReleaseSigning
+                ? signingConfigs.release
+                : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
+            shrinkResources enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+    }
+
+    splits {
+        abi {
+            reset()
+            enable true
+            universalApk false
+            include "armeabi-v7a", "arm64-v8a", "x86_64"
+        }
+    }
+}
+
+if (!hasReleaseSigning) {
+    gradle.projectsEvaluated {
+        logger.warn(
+            "[OrmuzApp] RELEASE signing variables not set — assembleRelease " +
+            "will use the DEBUG keystore. Do NOT ship this artifact."
+        )
     }
 }
 

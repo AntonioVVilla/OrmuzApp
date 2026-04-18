@@ -1,6 +1,7 @@
 import {useEffect, useState, useCallback} from 'react';
-import {Platform, PermissionsAndroid, Alert} from 'react-native';
+import {Platform, PermissionsAndroid} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import i18n from '../i18n';
 import {Coordinate} from '../types/station';
 import {DEFAULT_LOCATION} from '../utils/constants';
 
@@ -9,6 +10,32 @@ interface LocationState {
   loading: boolean;
   error: string | null;
   permissionGranted: boolean;
+}
+
+async function requestAndroidPermission(): Promise<boolean> {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: i18n.t('permission.title'),
+        message: i18n.t('permission.message'),
+        buttonPositive: i18n.t('permission.positive'),
+        buttonNegative: i18n.t('permission.negative'),
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch {
+    return false;
+  }
+}
+
+async function requestIosPermission(): Promise<boolean> {
+  try {
+    const result = await Geolocation.requestAuthorization('whenInUse');
+    return result === 'granted';
+  } catch {
+    return false;
+  }
 }
 
 export function useLocation(): LocationState & {refresh: () => void} {
@@ -20,24 +47,13 @@ export function useLocation(): LocationState & {refresh: () => void} {
   });
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
-    if (Platform.OS !== 'android') {
-      return false;
+    if (Platform.OS === 'android') {
+      return requestAndroidPermission();
     }
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Ubicación',
-          message:
-            'Ormuz necesita acceso a tu ubicación para mostrar gasolineras cercanas.',
-          buttonPositive: 'Permitir',
-          buttonNegative: 'Cancelar',
-        },
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch {
-      return false;
+    if (Platform.OS === 'ios') {
+      return requestIosPermission();
     }
+    return false;
   }, []);
 
   const getPosition = useCallback(() => {
@@ -58,7 +74,7 @@ export function useLocation(): LocationState & {refresh: () => void} {
         setState(prev => ({
           ...prev,
           loading: false,
-          error: `Error de ubicación: ${error.message}`,
+          error: i18n.t('errors.location', {detail: error.message}),
         }));
       },
       {
@@ -78,7 +94,7 @@ export function useLocation(): LocationState & {refresh: () => void} {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: 'Permiso de ubicación denegado. Mostrando Madrid por defecto.',
+        error: i18n.t('errors.permissionDenied'),
         permissionGranted: false,
       }));
     }

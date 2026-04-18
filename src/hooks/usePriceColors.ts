@@ -1,20 +1,27 @@
 import {useMemo} from 'react';
 import {Station} from '../types/station';
-import {priceToColor} from '../utils/colors';
+import {priceBucket, priceToColor} from '../utils/colors';
+
+interface Options {
+  colorblindSafe?: boolean;
+}
 
 /**
- * Compute color-coded stations based on selected fuel type price
+ * Compute color-coded stations based on the selected fuel type's price
+ * relative to the current result set. Also tags each station with a
+ * discrete `priceBucket` (1..3) so the UI can render a non-color
+ * indicator (e.g. € signs) alongside the colour.
  */
 export function usePriceColors(
   stations: Station[],
   selectedFuelLabel: string,
+  options: Options = {},
 ): Station[] {
   return useMemo(() => {
     if (stations.length === 0) {
       return [];
     }
 
-    // Get prices for the selected fuel type
     const pricesMap = new Map<string, number>();
     for (const station of stations) {
       const fuel = station.prices.find(p => p.fuelType === selectedFuelLabel);
@@ -37,8 +44,11 @@ export function usePriceColors(
         const price = pricesMap.get(station.id)!;
         return {
           ...station,
-          color: priceToColor(price, minPrice, maxPrice),
+          color: priceToColor(price, minPrice, maxPrice, {
+            colorblindSafe: options.colorblindSafe,
+          }),
+          priceBucket: priceBucket(price, minPrice, maxPrice),
         };
       });
-  }, [stations, selectedFuelLabel]);
+  }, [stations, selectedFuelLabel, options.colorblindSafe]);
 }

@@ -1,0 +1,11 @@
+# CODEOWNERS — anyone opening a PR against this repo will
+# automatically request review from the listed owners.
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+*                           @AntonioVVilla
+
+# Android / release toolchain — changes here affect the
+# shipped APK, so owner review is mandatory.
+/android/                   @AntonioVVilla
+/Dockerfile                 @AntonioVVilla
+/.github/workflows/         @AntonioVVilla

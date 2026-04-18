@@ -1,0 +1,61 @@
+{
+  "app": {
+    "defaultFallbackError": "An unexpected error occurred. Please try again."
+  },
+  "permission": {
+    "title": "Location",
+    "message": "Ormuz needs access to your location to show nearby fuel stations.",
+    "positive": "Allow",
+    "negative": "Cancel"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "retry": "Retry",
+    "location": "Location error: {{detail}}",
+    "permissionDenied": "Location permission denied. Showing Madrid by default.",
+    "offlineStale": "You're offline. Showing cached data.",
+    "fetchFailed": "Could not load fuel stations.",
+    "network": "Could not reach the service. Check your connection.",
+    "parse": "The received data is invalid. Please try later.",
+    "unknown": "Something went wrong. Please try again."
+  },
+  "loading": {
+    "stations": "Loading fuel stations..."
+  },
+  "searchRadius": {
+    "label": "Radius",
+    "unit": "km",
+    "decrease": "Decrease search radius",
+    "increase": "Increase search radius",
+    "value": "Current radius: {{radius}} kilometres"
+  },
+  "fuel": {
+    "selector": "Fuel type selector",
+    "chip": "Fuel {{label}}",
+    "chipSelected": "Fuel {{label}} selected"
+  },
+  "stationDetail": {
+    "prices": "Prices",
+    "navigate": "Directions",
+    "close": "Close",
+    "schedule": "Hours",
+    "distance": "{{distance}} away"
+  },
+  "map": {
+    "attribution": "© OpenStreetMap · OpenFreeMap",
+    "marker": "Fuel station {{name}}, {{fuel}} at {{price}} €/L, {{distance}} away"
+  },
+  "emptyState": {
+    "title": "No nearby stations",
+    "message": "No stations for this fuel type within the current radius.",
+    "increaseRadius": "Increase radius",
+    "retry": "Retry"
+  },
+  "offlineBadge": {
+    "label": "Offline"
+  },
+  "errorBanner": {
+    "dismiss": "OK",
+    "dismissLabel": "Dismiss notice"
+  }
+}

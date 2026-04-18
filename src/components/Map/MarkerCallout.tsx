@@ -7,7 +7,7 @@ interface Props {
   station: Station;
 }
 
-export default function MarkerCallout({station}: Props) {
+function MarkerCalloutBase({station}: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.name}>{station.name}</Text>
@@ -70,3 +70,5 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+export default React.memo(MarkerCalloutBase);

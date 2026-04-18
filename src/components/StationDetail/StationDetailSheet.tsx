@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo, useRef} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, Linking} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import {useTranslation} from 'react-i18next';
 import {Station} from '../../types/station';
 import {formatDistance} from '../../utils/formatPrice';
 import PriceRow from './PriceRow';
@@ -16,6 +17,7 @@ export default function StationDetailSheet({
   selectedFuelLabel,
   onClose,
 }: Props) {
+  const {t} = useTranslation();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['35%', '60%'], []);
 
@@ -23,7 +25,6 @@ export default function StationDetailSheet({
     if (!station) return;
     const url = `geo:${station.latitude},${station.longitude}?q=${station.latitude},${station.longitude}(${encodeURIComponent(station.name)})`;
     Linking.openURL(url).catch(() => {
-      // Fallback to Google Maps web URL
       Linking.openURL(
         `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`,
       );
@@ -49,27 +50,48 @@ export default function StationDetailSheet({
             </Text>
             {station.distance !== undefined && (
               <Text style={styles.distance}>
-                {formatDistance(station.distance)}
+                {t('stationDetail.distance', {
+                  distance: formatDistance(station.distance),
+                })}
               </Text>
             )}
           </View>
+          <TouchableOpacity
+            onPress={onClose}
+            style={styles.closeButton}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={t('stationDetail.close')}>
+            <Text style={styles.closeGlyph}>×</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.schedule}>{station.schedule}</Text>
 
         <View style={styles.pricesContainer}>
-          <Text style={styles.sectionTitle}>Precios</Text>
+          <Text style={styles.sectionTitle}>{t('stationDetail.prices')}</Text>
           {station.prices.map(fuel => (
             <PriceRow
               key={fuel.fuelType}
               fuel={fuel}
               isSelected={fuel.fuelType === selectedFuelLabel}
+              bucket={
+                fuel.fuelType === selectedFuelLabel
+                  ? station.priceBucket
+                  : undefined
+              }
             />
           ))}
         </View>
 
-        <TouchableOpacity style={styles.navButton} onPress={handleNavigate}>
-          <Text style={styles.navButtonText}>Cómo llegar</Text>
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={handleNavigate}
+          accessibilityRole="button"
+          accessibilityLabel={t('stationDetail.navigate')}>
+          <Text style={styles.navButtonText}>
+            {t('stationDetail.navigate')}
+          </Text>
         </TouchableOpacity>
       </BottomSheetScrollView>
     </BottomSheet>
@@ -119,6 +141,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
   },
+  closeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  closeGlyph: {
+    fontSize: 28,
+    color: '#666',
+    fontWeight: '400',
+    lineHeight: 30,
+  },
   schedule: {
     fontSize: 13,
     color: '#888',
@@ -138,6 +174,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
+    minHeight: 44,
+    justifyContent: 'center',
   },
   navButtonText: {
     color: '#FFF',

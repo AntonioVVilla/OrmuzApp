@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   message: string;
@@ -7,12 +8,16 @@ interface Props {
 }
 
 export default function ErrorBanner({message, onDismiss}: Props) {
+  const {t} = useTranslation();
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityRole="alert">
       <Text style={styles.text}>{message}</Text>
       {onDismiss && (
-        <TouchableOpacity onPress={onDismiss}>
-          <Text style={styles.dismiss}>OK</Text>
+        <TouchableOpacity
+          onPress={onDismiss}
+          accessibilityRole="button"
+          accessibilityLabel={t('errorBanner.dismissLabel')}>
+          <Text style={styles.dismiss}>{t('errorBanner.dismiss')}</Text>
         </TouchableOpacity>
       )}
     </View>

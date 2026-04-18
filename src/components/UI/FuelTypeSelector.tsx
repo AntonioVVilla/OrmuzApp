@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import {FUEL_TYPES} from '../../utils/constants';
 
 interface Props {
@@ -16,9 +17,13 @@ interface Props {
 
 export default function FuelTypeSelector({selectedFuelKey, onSelect}: Props) {
   const insets = useSafeAreaInsets();
+  const {t} = useTranslation();
 
   return (
-    <View style={[styles.container, {top: insets.top + 12}]}>
+    <View
+      style={[styles.container, {top: insets.top + 12}]}
+      accessibilityRole="tablist"
+      accessibilityLabel={t('fuel.selector')}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -30,7 +35,13 @@ export default function FuelTypeSelector({selectedFuelKey, onSelect}: Props) {
               key={fuel.key}
               style={[styles.chip, isSelected && styles.chipSelected]}
               onPress={() => onSelect(fuel.key, fuel.label)}
-              activeOpacity={0.7}>
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityState={{selected: isSelected}}
+              accessibilityLabel={t(
+                isSelected ? 'fuel.chipSelected' : 'fuel.chip',
+                {label: fuel.label},
+              )}>
               <Text
                 style={[
                   styles.chipText,
@@ -56,12 +67,16 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 12,
     gap: 8,
+    alignItems: 'center',
   },
   chip: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 22,
+    minHeight: 44,
+    minWidth: 44,
+    justifyContent: 'center',
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 1},
@@ -72,7 +87,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1976D2',
   },
   chipText: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333',
   },

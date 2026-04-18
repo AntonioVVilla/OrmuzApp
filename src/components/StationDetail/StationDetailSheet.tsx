@@ -25,7 +25,6 @@ export default function StationDetailSheet({
     if (!station) return;
     const url = `geo:${station.latitude},${station.longitude}?q=${station.latitude},${station.longitude}(${encodeURIComponent(station.name)})`;
     Linking.openURL(url).catch(() => {
-      // Fallback to Google Maps web URL
       Linking.openURL(
         `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`,
       );
@@ -51,10 +50,20 @@ export default function StationDetailSheet({
             </Text>
             {station.distance !== undefined && (
               <Text style={styles.distance}>
-                {formatDistance(station.distance)}
+                {t('stationDetail.distance', {
+                  distance: formatDistance(station.distance),
+                })}
               </Text>
             )}
           </View>
+          <TouchableOpacity
+            onPress={onClose}
+            style={styles.closeButton}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={t('stationDetail.close')}>
+            <Text style={styles.closeGlyph}>×</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.schedule}>{station.schedule}</Text>
@@ -66,6 +75,11 @@ export default function StationDetailSheet({
               key={fuel.fuelType}
               fuel={fuel}
               isSelected={fuel.fuelType === selectedFuelLabel}
+              bucket={
+                fuel.fuelType === selectedFuelLabel
+                  ? station.priceBucket
+                  : undefined
+              }
             />
           ))}
         </View>
@@ -127,6 +141,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 4,
   },
+  closeButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  closeGlyph: {
+    fontSize: 28,
+    color: '#666',
+    fontWeight: '400',
+    lineHeight: 30,
+  },
   schedule: {
     fontSize: 13,
     color: '#888',
@@ -146,6 +174,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
+    minHeight: 44,
+    justifyContent: 'center',
   },
   navButtonText: {
     color: '#FFF',

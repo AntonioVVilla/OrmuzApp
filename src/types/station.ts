@@ -16,6 +16,7 @@ export interface Station {
   prices: FuelPrice[];
   distance?: number;
   color?: string;
+  priceBucket?: 1 | 2 | 3;
 }
 
 export interface Coordinate {

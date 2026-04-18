@@ -1,4 +1,5 @@
 import {RawAPIResponseSchema, RawAPIResponseParsed} from '../schemas/api';
+import {withRetry} from './retry';
 
 const API_BASE =
   'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes';
@@ -17,9 +18,20 @@ export class ApiSchemaError extends Error {
   }
 }
 
-export async function fetchStationsByProvince(
-  provinceId: string,
-): Promise<RawAPIResponseParsed> {
+function isRetriable(err: unknown): boolean {
+  // Retry on transient network failures and 5xx responses. Do NOT
+  // retry on schema errors — those are deterministic contract
+  // mismatches that would just waste time and battery.
+  if (err instanceof ApiSchemaError) {
+    return false;
+  }
+  if (err instanceof ApiError) {
+    return err.status === undefined || err.status >= 500;
+  }
+  return true;
+}
+
+async function doFetch(provinceId: string): Promise<RawAPIResponseParsed> {
   const url = `${API_BASE}/EstacionesTerrestres/FiltroProvincia/${provinceId}`;
   const response = await fetch(url);
   if (!response.ok) {
@@ -42,4 +54,15 @@ export async function fetchStationsByProvince(
     throw new ApiError(`API returned: ${data.ResultadoConsulta}`);
   }
   return data;
+}
+
+export async function fetchStationsByProvince(
+  provinceId: string,
+): Promise<RawAPIResponseParsed> {
+  return withRetry(() => doFetch(provinceId), {
+    maxAttempts: 3,
+    baseDelayMs: 500,
+    maxDelayMs: 5000,
+    shouldRetry: isRetriable,
+  });
 }

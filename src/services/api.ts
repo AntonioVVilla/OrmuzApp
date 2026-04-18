@@ -4,9 +4,11 @@ const API_BASE = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburant
 
 export async function fetchStationsByProvince(
   provinceId: string,
+  signal?: AbortSignal,
 ): Promise<RawAPIResponse> {
   const response = await fetch(
     `${API_BASE}/EstacionesTerrestres/FiltroProvincia/${provinceId}`,
+    {signal},
   );
   if (!response.ok) {
     throw new Error(`API error: ${response.status} ${response.statusText}`);

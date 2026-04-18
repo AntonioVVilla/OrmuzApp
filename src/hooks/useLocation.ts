@@ -1,5 +1,5 @@
 import {useEffect, useState, useCallback} from 'react';
-import {Platform, PermissionsAndroid, Alert} from 'react-native';
+import {Platform, PermissionsAndroid} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import {Coordinate} from '../types/station';
 import {DEFAULT_LOCATION} from '../utils/constants';
@@ -11,6 +11,33 @@ interface LocationState {
   permissionGranted: boolean;
 }
 
+async function requestAndroidPermission(): Promise<boolean> {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Ubicación',
+        message:
+          'Ormuz necesita acceso a tu ubicación para mostrar gasolineras cercanas.',
+        buttonPositive: 'Permitir',
+        buttonNegative: 'Cancelar',
+      },
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  } catch {
+    return false;
+  }
+}
+
+async function requestIosPermission(): Promise<boolean> {
+  try {
+    const result = await Geolocation.requestAuthorization('whenInUse');
+    return result === 'granted';
+  } catch {
+    return false;
+  }
+}
+
 export function useLocation(): LocationState & {refresh: () => void} {
   const [state, setState] = useState<LocationState>({
     location: DEFAULT_LOCATION,
@@ -20,24 +47,13 @@ export function useLocation(): LocationState & {refresh: () => void} {
   });
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
-    if (Platform.OS !== 'android') {
-      return false;
+    if (Platform.OS === 'android') {
+      return requestAndroidPermission();
     }
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        {
-          title: 'Ubicación',
-          message:
-            'Ormuz necesita acceso a tu ubicación para mostrar gasolineras cercanas.',
-          buttonPositive: 'Permitir',
-          buttonNegative: 'Cancelar',
-        },
-      );
-      return granted === PermissionsAndroid.RESULTS.GRANTED;
-    } catch {
-      return false;
+    if (Platform.OS === 'ios') {
+      return requestIosPermission();
     }
+    return false;
   }, []);
 
   const getPosition = useCallback(() => {

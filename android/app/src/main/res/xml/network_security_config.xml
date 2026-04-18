@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Production default: reject any cleartext traffic. -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Explicit domain we actually call — keeps the door open for
+         HTTPS cert-pinning overrides later without reopening HTTP. -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">sedeaplicaciones.minetur.gob.es</domain>
+        <domain includeSubdomains="true">tiles.openfreemap.org</domain>
+    </domain-config>
+
+    <!-- Debug overrides: allow Metro/dev-server loopback addresses. -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+        <domain cleartextTrafficPermitted="true">localhost</domain>
+        <domain cleartextTrafficPermitted="true">10.0.2.2</domain>
+        <domain cleartextTrafficPermitted="true">10.0.3.2</domain>
+    </debug-overrides>
+</network-security-config>

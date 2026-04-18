@@ -18,10 +18,18 @@ export class ApiSchemaError extends Error {
   }
 }
 
+function isAbortError(err: unknown): boolean {
+  return err instanceof Error && err.name === 'AbortError';
+}
+
 function isRetriable(err: unknown): boolean {
   // Retry on transient network failures and 5xx responses. Do NOT
   // retry on schema errors — those are deterministic contract
-  // mismatches that would just waste time and battery.
+  // mismatches that would just waste time and battery. Aborts
+  // are user-initiated cancellations and must also be final.
+  if (isAbortError(err)) {
+    return false;
+  }
   if (err instanceof ApiSchemaError) {
     return false;
   }
@@ -31,9 +39,12 @@ function isRetriable(err: unknown): boolean {
   return true;
 }
 
-async function doFetch(provinceId: string): Promise<RawAPIResponseParsed> {
+async function doFetch(
+  provinceId: string,
+  signal?: AbortSignal,
+): Promise<RawAPIResponseParsed> {
   const url = `${API_BASE}/EstacionesTerrestres/FiltroProvincia/${provinceId}`;
-  const response = await fetch(url);
+  const response = await fetch(url, signal ? {signal} : undefined);
   if (!response.ok) {
     throw new ApiError(
       `API error: ${response.status} ${response.statusText}`,
@@ -58,8 +69,9 @@ async function doFetch(provinceId: string): Promise<RawAPIResponseParsed> {
 
 export async function fetchStationsByProvince(
   provinceId: string,
+  signal?: AbortSignal,
 ): Promise<RawAPIResponseParsed> {
-  return withRetry(() => doFetch(provinceId), {
+  return withRetry(() => doFetch(provinceId, signal), {
     maxAttempts: 3,
     baseDelayMs: 500,
     maxDelayMs: 5000,

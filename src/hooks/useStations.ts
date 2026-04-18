@@ -1,4 +1,4 @@
-import {useEffect, useState, useCallback, useMemo} from 'react';
+import {useEffect, useState, useCallback, useMemo, useRef} from 'react';
 import {fetchStationsByProvince} from '../services/api';
 import {parseAllStations} from '../services/parser';
 import {filterByProximity} from '../services/geo';
@@ -38,12 +38,18 @@ export function useStations(
 ) {
   const [state, setState] = useState<StationsState>(INITIAL_STATE);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const provinceId = useMemo(
     () => getProvinceId(location.latitude, location.longitude),
     [location.latitude, location.longitude],
   );
 
   const loadStations = useCallback(async () => {
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setState(prev => {
       const provinceChanged = prev.provinceId !== provinceId;
       return {
@@ -60,9 +66,16 @@ export function useStations(
       let stations = await getCachedStations(provinceId);
 
       if (!stations) {
-        const response = await fetchStationsByProvince(provinceId);
+        const response = await fetchStationsByProvince(
+          provinceId,
+          controller.signal,
+        );
         stations = parseAllStations(response.ListaEESSPrecio);
         await cacheStations(provinceId, stations);
+      }
+
+      if (controller.signal.aborted) {
+        return;
       }
 
       setState(prev => ({
@@ -72,6 +85,10 @@ export function useStations(
         lastUpdate: new Date(),
       }));
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
+
       try {
         const cached = await getCachedStationsIgnoreTTL(provinceId);
         if (cached && cached.length > 0) {
@@ -128,6 +145,12 @@ export function useStations(
   useEffect(() => {
     loadStations();
   }, [loadStations]);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   return {
     ...state,

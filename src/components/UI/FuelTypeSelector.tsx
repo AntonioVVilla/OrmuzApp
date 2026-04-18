@@ -15,7 +15,7 @@ interface Props {
   onSelect: (fuelKey: string, fuelLabel: string) => void;
 }
 
-export default function FuelTypeSelector({selectedFuelKey, onSelect}: Props) {
+function FuelTypeSelectorBase({selectedFuelKey, onSelect}: Props) {
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
 
@@ -95,3 +95,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 });
+
+export default React.memo(FuelTypeSelectorBase);

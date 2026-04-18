@@ -16,7 +16,7 @@ interface Props {
   onPress: (station: Station) => void;
 }
 
-export default function StationMarker({
+function StationMarkerBase({
   station,
   selectedFuelLabel,
   onPress,
@@ -110,3 +110,5 @@ const styles = StyleSheet.create({
     marginTop: -1,
   },
 });
+
+export default React.memo(StationMarkerBase);

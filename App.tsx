@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useCallback, useDeferredValue, useEffect} from 'react';
 import {StyleSheet, StatusBar, View} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -32,6 +32,10 @@ function App() {
     DEFAULT_FUEL_TYPE.label,
   );
   const [radius, setRadius] = useState(DEFAULT_RADIUS_KM);
+  // Defer the radius used by the expensive proximity filter so rapid
+  // +/- taps update the on-screen control immediately and the map
+  // recomputes on the next idle tick. Cheap version of debouncing.
+  const deferredRadius = useDeferredValue(radius);
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [errorDismissed, setErrorDismissed] = useState(false);
 
@@ -41,7 +45,7 @@ function App() {
     loading: stationsLoading,
     error,
     refresh: refreshStations,
-  } = useStations(location, radius, selectedFuelLabel);
+  } = useStations(location, deferredRadius, selectedFuelLabel);
   const coloredStations = usePriceColors(nearbyStations, selectedFuelLabel);
 
   const handleFuelSelect = useCallback(

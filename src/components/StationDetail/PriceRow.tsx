@@ -10,7 +10,7 @@ interface Props {
   bucket?: 1 | 2 | 3;
 }
 
-export default function PriceRow({fuel, isSelected, bucket}: Props) {
+function PriceRowBase({fuel, isSelected, bucket}: Props) {
   return (
     <View style={[styles.container, isSelected && styles.selected]}>
       <Text style={[styles.fuelType, isSelected && styles.selectedText]}>
@@ -74,3 +74,5 @@ const styles = StyleSheet.create({
     color: '#222',
   },
 });
+
+export default React.memo(PriceRowBase);

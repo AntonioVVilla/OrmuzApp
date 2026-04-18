@@ -18,6 +18,7 @@ export const StationSchema = z.object({
   prices: z.array(FuelPriceSchema),
   distance: z.number().optional(),
   color: z.string().optional(),
+  priceBucket: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
 });
 
 export const StationArraySchema = z.array(StationSchema);

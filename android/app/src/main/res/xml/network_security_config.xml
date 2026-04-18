@@ -7,21 +7,18 @@
         </trust-anchors>
     </base-config>
 
-    <!-- Explicit domain we actually call — keeps the door open for
-         HTTPS cert-pinning overrides later without reopening HTTP. -->
+    <!-- Explicit HTTPS-only policy for the domains we actually hit. -->
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">sedeaplicaciones.minetur.gob.es</domain>
         <domain includeSubdomains="true">tiles.openfreemap.org</domain>
     </domain-config>
 
-    <!-- Debug overrides: allow Metro/dev-server loopback addresses. -->
-    <debug-overrides>
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
-        </trust-anchors>
-        <domain cleartextTrafficPermitted="true">localhost</domain>
-        <domain cleartextTrafficPermitted="true">10.0.2.2</domain>
-        <domain cleartextTrafficPermitted="true">10.0.3.2</domain>
-    </debug-overrides>
+    <!--
+      Debug builds use a separate config at
+      `android/app/src/debug/res/xml/network_security_config.xml`
+      that additionally whitelists loopback/emulator addresses
+      (localhost, 10.0.2.2, 10.0.3.2) for Metro. `<debug-overrides>`
+      is intentionally omitted here because the Android lint rule
+      `NetworkSecurityConfig` rejects `<domain>` children inside it.
+    -->
 </network-security-config>

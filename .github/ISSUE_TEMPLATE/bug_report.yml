@@ -1,0 +1,90 @@
+name: Bug report
+description: Reporta un fallo reproducible de la app.
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por dedicar tiempo a reportar un bug. Cuanta más información
+        incluyas, antes podremos reproducirlo y arreglarlo.
+
+        > Si es un fallo de **seguridad**, por favor NO abras un issue
+        > público — sigue el procedimiento de [SECURITY.md](../SECURITY.md).
+
+  - type: input
+    id: version
+    attributes:
+      label: Versión de la app
+      description: Visible en Ajustes → Acerca de, o el nombre del APK que instalaste.
+      placeholder: "1.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_source
+    attributes:
+      label: Origen del APK
+      options:
+        - GitHub Releases
+        - APK compilado localmente
+        - Docker
+        - Otro (indícalo en "Información extra")
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Dispositivo
+      placeholder: "Pixel 7, Samsung Galaxy S23, emulador AVD Pixel 7 API 34..."
+    validations:
+      required: true
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Versión de Android
+      placeholder: "14 (API 34)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      description: Lo más preciso posible. Numera los pasos.
+      placeholder: |
+        1. Abro la app con GPS activado en Madrid.
+        2. Pulso el selector de combustible y elijo "Gasóleo A".
+        3. El mapa...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento esperado
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Comportamiento real
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / capturas
+      description: |
+        `adb logcat *:E` y captura de pantalla si aplica. Pega los logs
+        dentro de un bloque ```.
+      render: shell
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Información extra

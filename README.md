@@ -1,5 +1,11 @@
 # OrmuzApp — Mapa de precios de gasolina en España
 
+[![CI](https://github.com/AntonioVVilla/OrmuzApp/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/AntonioVVilla/OrmuzApp/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/AntonioVVilla/OrmuzApp/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/AntonioVVilla/OrmuzApp/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D22.11-brightgreen)](https://nodejs.org/)
+[![React Native](https://img.shields.io/badge/React%20Native-0.84-61dafb?logo=react)](https://reactnative.dev/)
+
 > **Vibecoded** con [Claude Code](https://claude.ai/code) — generado, auditado y depurado mediante IA.
 
 App Android que muestra en un mapa interactivo los precios de gasolina en España, con marcadores color-coded (verde = barato, rojo = caro). Carga únicamente las gasolineras de la provincia donde estás, sin descargar los ~12.000 registros nacionales.
@@ -633,9 +639,22 @@ adb install android\app\build\outputs\apk\release\app-release.apk
 
 ---
 
+## Documentación adicional
+
+- [CHANGELOG.md](CHANGELOG.md) — historial de cambios (Keep a Changelog).
+- [CONTRIBUTING.md](CONTRIBUTING.md) — cómo montar el entorno y abrir un PR.
+- [SECURITY.md](SECURITY.md) — política de divulgación y SLA.
+- [ATTRIBUTION.md](ATTRIBUTION.md) — atribuciones a OpenStreetMap (ODbL), OpenFreeMap y Ministerio de Industria.
+
+---
+
 ## Licencia
 
 MIT — ver [LICENSE](LICENSE).
+
+Map data © OpenStreetMap contributors, licensed under
+[ODbL](https://opendatacommons.org/licenses/odbl/) — ver
+[ATTRIBUTION.md](ATTRIBUTION.md) para el detalle completo.
 
 ---
 

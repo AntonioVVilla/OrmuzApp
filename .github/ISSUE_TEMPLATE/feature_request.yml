@@ -1,0 +1,46 @@
+name: Feature request
+description: Propón una mejora o funcionalidad nueva.
+title: "[feat] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¿Echas algo en falta? Cuéntanos qué y por qué, y si tienes idea del
+        cómo, mucho mejor.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema o limitación actual
+      description: "¿Qué no funciona hoy, o qué es menos cómodo de lo que podría?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta
+      description: "Cómo debería comportarse la app. Si tienes mockups o ejemplos, adjúntalos."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Área principal
+      options:
+        - UI / UX
+        - Mapa / rendering
+        - Datos / API
+        - Accesibilidad
+        - i18n / traducción
+        - Build / CI / release
+        - Otro
+    validations:
+      required: true

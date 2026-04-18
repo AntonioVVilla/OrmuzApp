@@ -1,10 +1,60 @@
-node_modules/
-android/.gradle/
-android/app/build/
+# Version control
 .git/
-output/
+.gitignore
+.gitattributes
+
+# Node / JS build artefacts
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+
+# Android build artefacts (regenerated inside the container)
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/local.properties
+
+# iOS — not built inside this image
 ios/
+*.xcworkspace
+*.xcodeproj
+
+# Secrets & local overrides — must NEVER end up in a layer
+*.keystore
+*.jks
+**/release.keystore
+android/app/debug.keystore.local
+.env
+.env.*
+secrets/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker / CI scaffolding
+Dockerfile
+.dockerignore
+.github/
+output/
+
+# Tooling / docs not needed at build time
 .claude/
-__tests__/
+.vercel/
 *.md
-.bundle/
+docs/
+
+# Test output
+__tests__/
+jest.config.js
+jest.setup.js
+
+# Metro cache
+.metro-cache/

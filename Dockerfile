@@ -91,7 +91,7 @@ RUN --mount=type=cache,target=/home/builder/.gradle/caches,uid=1000,gid=1000 \
 ############################################################
 # Stage 2 — output (minimal artifact carrier)
 ############################################################
-FROM alpine:3.19 AS output
+FROM alpine:3.23 AS output
 
 RUN addgroup -g 1000 ormuz && \
     adduser -D -u 1000 -G ormuz -h /home/ormuz ormuz

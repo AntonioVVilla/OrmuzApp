@@ -14,12 +14,12 @@
     "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {
-    "@gorhom/bottom-sheet": "^5.2.8",
+    "@gorhom/bottom-sheet": "^5.2.9",
     "@maplibre/maplibre-react-native": "^11.0.0-beta.21",
     "@react-native-async-storage/async-storage": "^3.0.1",
     "@react-native/new-app-screen": "0.84.1",
     "i18next": "^26.0.5",
-    "react": "19.2.3",
+    "react": "19.2.5",
     "react-i18next": "^17.0.4",
     "react-native": "0.84.1",
     "react-native-geolocation-service": "^5.3.1",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@babel/plugin-transform-export-namespace-from": "^7.27.1",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
     "@react-native-community/cli": "20.1.0",
@@ -47,9 +48,9 @@
     "@types/react-test-renderer": "^19.1.0",
     "eslint": "^8.19.0",
     "jest": "^29.6.3",
-    "prettier": "2.8.8",
+    "prettier": "3.8.3",
     "react-test-renderer": "19.2.5",
-    "typescript": "^5.8.3"
+    "typescript": "^6.0.3"
   },
   "engines": {
     "node": ">= 22.11.0"

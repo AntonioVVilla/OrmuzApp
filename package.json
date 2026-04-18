@@ -19,7 +19,7 @@
     "@react-native-async-storage/async-storage": "^3.0.2",
     "@react-native/new-app-screen": "0.85.1",
     "i18next": "^26.0.5",
-    "react": "19.2.5",
+    "react": "19.2.3",
     "react-i18next": "^17.0.4",
     "react-native": "0.85.1",
     "react-native-geolocation-service": "^5.3.1",
@@ -50,7 +50,7 @@
     "eslint": "^8.19.0",
     "jest": "^30.3.0",
     "prettier": "3.8.3",
-    "react-test-renderer": "19.2.5",
+    "react-test-renderer": "19.2.3",
     "typescript": "^6.0.3"
   },
   "engines": {

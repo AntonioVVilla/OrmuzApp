@@ -2,31 +2,40 @@ import {useEffect, useState, useCallback, useMemo} from 'react';
 import {fetchStationsByProvince} from '../services/api';
 import {parseAllStations} from '../services/parser';
 import {filterByProximity} from '../services/geo';
-import {getCachedStations, getCachedStationsIgnoreTTL, cacheStations} from '../services/cache';
+import {
+  getCachedStations,
+  getCachedStationsIgnoreTTL,
+  cacheStations,
+} from '../services/cache';
 import {getProvinceId} from '../utils/provinces';
 import {Coordinate, Station} from '../types/station';
+import {AppError, toAppError} from '../types/errors';
 import {MAX_STATIONS} from '../utils/constants';
 
 interface StationsState {
   allStations: Station[];
   nearbyStations: Station[];
   loading: boolean;
-  error: string | null;
+  error: AppError | null;
   lastUpdate: Date | null;
+  provinceId: string | null;
 }
+
+const INITIAL_STATE: StationsState = {
+  allStations: [],
+  nearbyStations: [],
+  loading: true,
+  error: null,
+  lastUpdate: null,
+  provinceId: null,
+};
 
 export function useStations(
   location: Coordinate,
   radiusKm: number,
   selectedFuelLabel: string,
 ) {
-  const [state, setState] = useState<StationsState>({
-    allStations: [],
-    nearbyStations: [],
-    loading: true,
-    error: null,
-    lastUpdate: null,
-  });
+  const [state, setState] = useState<StationsState>(INITIAL_STATE);
 
   const provinceId = useMemo(
     () => getProvinceId(location.latitude, location.longitude),
@@ -34,14 +43,22 @@ export function useStations(
   );
 
   const loadStations = useCallback(async () => {
-    setState(prev => ({...prev, loading: true, error: null}));
+    setState(prev => {
+      const provinceChanged = prev.provinceId !== provinceId;
+      return {
+        ...prev,
+        loading: true,
+        error: null,
+        allStations: provinceChanged ? [] : prev.allStations,
+        nearbyStations: provinceChanged ? [] : prev.nearbyStations,
+        provinceId,
+      };
+    });
 
     try {
-      // Try cache first
       let stations = await getCachedStations(provinceId);
 
       if (!stations) {
-        // Fetch only this province (~500-700 stations instead of 12,000)
         const response = await fetchStationsByProvince(provinceId);
         stations = parseAllStations(response.ListaEESSPrecio);
         await cacheStations(provinceId, stations);
@@ -49,40 +66,43 @@ export function useStations(
 
       setState(prev => ({
         ...prev,
-        allStations: stations!,
+        allStations: stations ?? [],
         loading: false,
         lastUpdate: new Date(),
       }));
     } catch (err) {
-      // If fetch fails, try cache regardless of TTL
       try {
         const cached = await getCachedStationsIgnoreTTL(provinceId);
-        if (cached) {
+        if (cached && cached.length > 0) {
           setState(prev => ({
             ...prev,
             allStations: cached,
             loading: false,
-            error: 'Sin conexión. Mostrando datos en caché.',
+            error: {
+              code: 'OFFLINE_STALE',
+              message: 'Sin conexión. Mostrando datos en caché.',
+            },
             lastUpdate: new Date(),
           }));
           return;
         }
-      } catch {}
+      } catch {
+        // cache fallback itself failed, fall through to main error
+      }
 
       setState(prev => ({
         ...prev,
         loading: false,
-        error:
-          err instanceof Error
-            ? err.message
-            : 'Error al cargar las gasolineras',
+        error: toAppError(err, 'NETWORK'),
       }));
     }
   }, [provinceId]);
 
-  // Filter by proximity when location/radius/allStations change
   useEffect(() => {
     if (state.allStations.length === 0) {
+      setState(prev =>
+        prev.nearbyStations.length === 0 ? prev : {...prev, nearbyStations: []},
+      );
       return;
     }
 

@@ -83,7 +83,10 @@ function App() {
           {isLoading && <LoadingOverlay />}
 
           {error && !errorDismissed && (
-            <ErrorBanner message={error} onDismiss={handleDismissError} />
+            <ErrorBanner
+              message={error.message}
+              onDismiss={handleDismissError}
+            />
           )}
 
           {selectedStation && (

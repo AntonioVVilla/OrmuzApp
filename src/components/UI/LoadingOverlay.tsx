@@ -1,18 +1,19 @@
 import React from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
 
 interface Props {
   message?: string;
 }
 
-export default function LoadingOverlay({
-  message = 'Cargando gasolineras...',
-}: Props) {
+export default function LoadingOverlay({message}: Props) {
+  const {t} = useTranslation();
+  const text = message ?? t('loading.stations');
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <ActivityIndicator size="large" color="#1976D2" />
-        <Text style={styles.text}>{message}</Text>
+        <Text style={styles.text}>{text}</Text>
       </View>
     </View>
   );

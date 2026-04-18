@@ -2,6 +2,7 @@ import React, {useState, useCallback, useEffect} from 'react';
 import {StyleSheet, StatusBar, View} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import './src/i18n';
 import MapView from './src/components/Map/MapView';
 import FuelTypeSelector from './src/components/UI/FuelTypeSelector';
 import SearchRadius from './src/components/UI/SearchRadius';

@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo, useRef} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, Linking} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
+import {useTranslation} from 'react-i18next';
 import {Station} from '../../types/station';
 import {formatDistance} from '../../utils/formatPrice';
 import PriceRow from './PriceRow';
@@ -16,6 +17,7 @@ export default function StationDetailSheet({
   selectedFuelLabel,
   onClose,
 }: Props) {
+  const {t} = useTranslation();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['35%', '60%'], []);
 
@@ -58,7 +60,7 @@ export default function StationDetailSheet({
         <Text style={styles.schedule}>{station.schedule}</Text>
 
         <View style={styles.pricesContainer}>
-          <Text style={styles.sectionTitle}>Precios</Text>
+          <Text style={styles.sectionTitle}>{t('stationDetail.prices')}</Text>
           {station.prices.map(fuel => (
             <PriceRow
               key={fuel.fuelType}
@@ -68,8 +70,14 @@ export default function StationDetailSheet({
           ))}
         </View>
 
-        <TouchableOpacity style={styles.navButton} onPress={handleNavigate}>
-          <Text style={styles.navButtonText}>Cómo llegar</Text>
+        <TouchableOpacity
+          style={styles.navButton}
+          onPress={handleNavigate}
+          accessibilityRole="button"
+          accessibilityLabel={t('stationDetail.navigate')}>
+          <Text style={styles.navButtonText}>
+            {t('stationDetail.navigate')}
+          </Text>
         </TouchableOpacity>
       </BottomSheetScrollView>
     </BottomSheet>

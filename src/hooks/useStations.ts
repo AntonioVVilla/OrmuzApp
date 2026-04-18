@@ -11,6 +11,7 @@ import {getProvinceId} from '../utils/provinces';
 import {Coordinate, Station} from '../types/station';
 import {AppError, toAppError} from '../types/errors';
 import {MAX_STATIONS} from '../utils/constants';
+import i18n from '../i18n';
 
 interface StationsState {
   allStations: Station[];
@@ -80,7 +81,7 @@ export function useStations(
             loading: false,
             error: {
               code: 'OFFLINE_STALE',
-              message: 'Sin conexión. Mostrando datos en caché.',
+              message: i18n.t('errors.offlineStale'),
             },
             lastUpdate: new Date(),
           }));
@@ -90,10 +91,14 @@ export function useStations(
         // cache fallback itself failed, fall through to main error
       }
 
+      const appErr = toAppError(err, 'NETWORK');
       setState(prev => ({
         ...prev,
         loading: false,
-        error: toAppError(err, 'NETWORK'),
+        error: {
+          code: appErr.code,
+          message: i18n.t('errors.network'),
+        },
       }));
     }
   }, [provinceId]);

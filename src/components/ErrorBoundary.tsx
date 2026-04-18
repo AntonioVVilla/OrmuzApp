@@ -1,5 +1,6 @@
 import React, {ErrorInfo, PropsWithChildren} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import i18n from '../i18n';
 
 interface State {
   error: Error | null;
@@ -18,7 +19,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     if (__DEV__) {
-      // eslint-disable-next-line no-console
       console.error('[ErrorBoundary]', error, info);
     }
   }
@@ -31,10 +31,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.error) {
       return (
         <View style={styles.container} accessibilityRole="alert">
-          <Text style={styles.title}>Algo no salió bien</Text>
+          <Text style={styles.title}>{i18n.t('errors.title')}</Text>
           <Text style={styles.message}>
-            {this.props.fallbackMessage ??
-              'Ha ocurrido un error inesperado. Vuelve a intentarlo.'}
+            {this.props.fallbackMessage ?? i18n.t('app.defaultFallbackError')}
           </Text>
           {__DEV__ && (
             <Text style={styles.detail}>{this.state.error.message}</Text>
@@ -43,8 +42,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
             style={styles.button}
             onPress={this.handleRetry}
             accessibilityRole="button"
-            accessibilityLabel="Reintentar">
-            <Text style={styles.buttonText}>Reintentar</Text>
+            accessibilityLabel={i18n.t('errors.retry')}>
+            <Text style={styles.buttonText}>{i18n.t('errors.retry')}</Text>
           </TouchableOpacity>
         </View>
       );

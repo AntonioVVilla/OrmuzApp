@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {useTranslation} from 'react-i18next';
 import {MIN_RADIUS_KM, MAX_RADIUS_KM} from '../../utils/constants';
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 }
 
 export default function SearchRadius({radius, onRadiusChange}: Props) {
-  // Simple +/- buttons since Slider requires extra dependency
+  const {t} = useTranslation();
   const decrease = () => {
     const newRadius = Math.max(MIN_RADIUS_KM, radius - 5);
     onRadiusChange(newRadius);
@@ -21,12 +22,14 @@ export default function SearchRadius({radius, onRadiusChange}: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Radio</Text>
+      <Text style={styles.label}>{t('searchRadius.label')}</Text>
       <View style={styles.controls}>
         <TouchableOpacity onPress={decrease} activeOpacity={0.6} hitSlop={8}>
           <Text style={styles.button}>−</Text>
         </TouchableOpacity>
-        <Text style={styles.value}>{radius} km</Text>
+        <Text style={styles.value}>
+          {radius} {t('searchRadius.unit')}
+        </Text>
         <TouchableOpacity onPress={increase} activeOpacity={0.6} hitSlop={8}>
           <Text style={styles.button}>+</Text>
         </TouchableOpacity>

@@ -8,6 +8,7 @@ import SearchRadius from './src/components/UI/SearchRadius';
 import LoadingOverlay from './src/components/UI/LoadingOverlay';
 import ErrorBanner from './src/components/UI/ErrorBanner';
 import StationDetailSheet from './src/components/StationDetail/StationDetailSheet';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import {useLocation} from './src/hooks/useLocation';
 import {useStations} from './src/hooks/useStations';
 import {usePriceColors} from './src/hooks/usePriceColors';
@@ -58,14 +59,15 @@ function App() {
   const isLoading = locationLoading || stationsLoading;
 
   return (
-    <GestureHandlerRootView style={styles.flex}>
-      <SafeAreaProvider>
-        <StatusBar
-          barStyle="dark-content"
-          backgroundColor="transparent"
-          translucent
-        />
-        <View style={styles.flex}>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={styles.flex}>
+        <SafeAreaProvider>
+          <StatusBar
+            barStyle="dark-content"
+            backgroundColor="transparent"
+            translucent
+          />
+          <View style={styles.flex}>
           <MapView
             stations={coloredStations}
             userLocation={location}
@@ -96,9 +98,10 @@ function App() {
               onClose={handleCloseDetail}
             />
           )}
-        </View>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+          </View>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 

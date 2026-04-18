@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Station} from '../types/station';
+import {StationArraySchema} from '../schemas/station';
 import {CACHE_TTL_MS} from '../utils/constants';
 
 function cacheKey(provinceId: string) {
@@ -7,6 +8,28 @@ function cacheKey(provinceId: string) {
 }
 function timestampKey(provinceId: string) {
   return `stations_cache_ts_${provinceId}`;
+}
+
+function safeParseStations(dataStr: string): Station[] | null {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(dataStr);
+  } catch {
+    return null;
+  }
+  const result = StationArraySchema.safeParse(parsed);
+  return result.success ? result.data : null;
+}
+
+async function clearCache(provinceId: string): Promise<void> {
+  try {
+    await Promise.all([
+      AsyncStorage.removeItem(cacheKey(provinceId)),
+      AsyncStorage.removeItem(timestampKey(provinceId)),
+    ]);
+  } catch {
+    // Ignore — cache cleanup is best-effort.
+  }
 }
 
 export async function getCachedStations(
@@ -23,11 +46,20 @@ export async function getCachedStations(
     }
 
     const timestamp = parseInt(tsStr, 10);
+    if (!Number.isFinite(timestamp)) {
+      await clearCache(provinceId);
+      return null;
+    }
     if (Date.now() - timestamp > CACHE_TTL_MS) {
       return null; // Cache expired
     }
 
-    return JSON.parse(dataStr) as Station[];
+    const stations = safeParseStations(dataStr);
+    if (!stations) {
+      await clearCache(provinceId);
+      return null;
+    }
+    return stations;
   } catch {
     return null;
   }
@@ -41,7 +73,12 @@ export async function getCachedStationsIgnoreTTL(
     if (!dataStr) {
       return null;
     }
-    return JSON.parse(dataStr) as Station[];
+    const stations = safeParseStations(dataStr);
+    if (!stations) {
+      await clearCache(provinceId);
+      return null;
+    }
+    return stations;
   } catch {
     return null;
   }

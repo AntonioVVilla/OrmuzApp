@@ -1,19 +1,45 @@
-import {RawAPIResponse} from '../types/api';
+import {RawAPIResponseSchema, RawAPIResponseParsed} from '../schemas/api';
 
-const API_BASE = 'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes';
+const API_BASE =
+  'https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes';
+
+export class ApiError extends Error {
+  constructor(message: string, public readonly status?: number) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+export class ApiSchemaError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ApiSchemaError';
+  }
+}
 
 export async function fetchStationsByProvince(
   provinceId: string,
-): Promise<RawAPIResponse> {
-  const response = await fetch(
-    `${API_BASE}/EstacionesTerrestres/FiltroProvincia/${provinceId}`,
-  );
+): Promise<RawAPIResponseParsed> {
+  const url = `${API_BASE}/EstacionesTerrestres/FiltroProvincia/${provinceId}`;
+  const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    throw new ApiError(
+      `API error: ${response.status} ${response.statusText}`,
+      response.status,
+    );
   }
-  const data: RawAPIResponse = await response.json();
+
+  const rawJson: unknown = await response.json();
+  const parseResult = RawAPIResponseSchema.safeParse(rawJson);
+  if (!parseResult.success) {
+    throw new ApiSchemaError(
+      `Unexpected API response shape: ${parseResult.error.message}`,
+    );
+  }
+
+  const data = parseResult.data;
   if (data.ResultadoConsulta !== 'OK') {
-    throw new Error(`API returned: ${data.ResultadoConsulta}`);
+    throw new ApiError(`API returned: ${data.ResultadoConsulta}`);
   }
   return data;
 }

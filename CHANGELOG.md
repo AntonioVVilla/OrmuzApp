@@ -7,7 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-_Next release — currently empty._
+### Added
+
+- **Preparación para Google Play Store**: política de privacidad
+  pública en `https://antoniovvilla.github.io/OrmuzApp/privacy/`
+  (versión ES) y `/privacy/en/` (EN), sitio Jekyll mínimo servido
+  desde `docs/`, y borrador completo del listado de Play
+  (`docs/play-store-listing.md`) con título, descripciones
+  corta/larga (ES+EN), respuestas al formulario Data Safety y
+  checklist de publicación.
+- **AAB en CI**: `release.yml` ahora compila
+  `:app:assembleRelease` **y** `:app:bundleRelease` en el mismo
+  job; la Release de GitHub incluye tanto los APKs por ABI como
+  el `.aab` listo para subir a Play Console.
+- **Screenshots iniciales para Play** capturados desde un
+  dispositivo real (Vivo V2427) en `docs/screenshots/`.
+
+### Fixed
+
+- **Atribución de OpenStreetMap tappable**: el icono nativo de
+  atribución de MapLibre se renderizaba en la esquina
+  inferior-izquierda del mapa, exactamente debajo del pill
+  flotante de "Radio". El `<SeekBar>` del pill interceptaba el
+  tap, así que los usuarios nunca podían abrir el diálogo con
+  "© OpenStreetMap contributors" — un problema de cumplimiento
+  ODbL y de accesibilidad. La atribución se ha movido a
+  `{bottom: 8, right: 8}` para que quede visible y tappable en
+  todas las orientaciones y tamaños de pantalla.
 
 ## [1.1.3] — 2026-04-19
 

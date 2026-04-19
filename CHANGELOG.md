@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+_Next release — currently empty._
+
+## [1.1.3] — 2026-04-19
+
+### Added
+
+- **Deep-links de navegación** en el detalle de estación: dos
+  botones primarios (Google Maps + Waze) y uno secundario
+  "Mapas del sistema" que intentan el esquema nativo
+  (`comgooglemaps://`, `waze://`, `geo:`) y caen al fallback
+  HTTPS si la app no está instalada.
+- **AndroidManifest `<queries>`** para `com.google.android.apps.maps`
+  y `com.waze` — requerido por la restricción de visibilidad
+  de paquetes de Android 11+ para que `Linking.canOpenURL`
+  devuelva `true` cuando la app destino sí está instalada.
+- **Workflow `auto-tag.yml`** que detecta bumps de `versionName`
+  en `android/app/build.gradle` al mergear a master y
+  dispara `release.yml` automáticamente — elimina el paso
+  manual de `git tag && git push --tags`.
+
+### Fixed
+
+- **Brújula de MapLibre**: quedaba oculta detrás de la fila
+  flotante de chips de tipo de combustible. Ahora se ancla con
+  `OrnamentViewPosition` y `useSafeAreaInsets()` para que
+  aparezca debajo de los chips en cualquier dispositivo,
+  respetando notch/dynamic island.
+
+---
+
+> **Historical drift note.** The block below accumulated entries for
+> work that actually shipped across releases **1.1.0 – 1.1.2** but was
+> never moved out of `[Unreleased]` at release time. It is preserved
+> verbatim below until a reconciliation PR splits it into the correct
+> per-version sections. See issue tracker for the follow-up task.
+>
+> Keep-a-Changelog purists: the headings that follow are deliberately
+> NOT `##`-level release headings — they are plain `###` groupings
+> under this drift note so the TOC stays clean until reconciled.
+
 ### Added
 
 - **i18n**: `react-i18next` con locales `es` (default) y `en`;
@@ -86,5 +126,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   provincia, color-coding verde→rojo por precio, detalle en
   bottom sheet y filtro por tipo de combustible y radio.
 
-[Unreleased]: https://github.com/AntonioVVilla/OrmuzApp/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/AntonioVVilla/OrmuzApp/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/AntonioVVilla/OrmuzApp/releases/tag/v1.1.3
 [1.0.0]: https://github.com/AntonioVVilla/OrmuzApp/releases/tag/v1.0.0

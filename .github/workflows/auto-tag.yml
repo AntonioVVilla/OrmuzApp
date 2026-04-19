@@ -1,0 +1,182 @@
+name: Auto-tag on versionName bump
+
+# Fires on every push to the default branch (typically a PR merge) and
+# creates the release tag `v${versionName}` **only when** the commit
+# changed `versionName` in `android/app/build.gradle`. Bumping that line
+# is already part of the release checklist — by making the tag an
+# automatic side-effect we eliminate the "forgot to push the tag"
+# failure mode without introducing any new commit conventions or bots.
+#
+# The tag is created at the exact SHA that performed the bump, then
+# `release.yml` is dispatched explicitly at that tag.
+#
+# Why the explicit dispatch?
+# -------------------------
+# GitHub intentionally does NOT fire further workflows when a push
+# (including a tag push) is made with the default `GITHUB_TOKEN` — this
+# is the anti-recursion guardrail. Without an explicit dispatch, our
+# `release.yml` (triggered by `push: tags: ['v*']`) would never run.
+# The alternative is pushing the tag with a user-owned PAT stored in a
+# secret; we prefer the dispatch path because it keeps the repo free of
+# additional long-lived credentials.
+#
+# What stops a runaway?
+# ---------------------
+#   * We only run on pushes to master/main (not tag pushes), so tagging
+#     itself cannot re-trigger this workflow.
+#   * We skip if the tag already exists (idempotent re-runs).
+#   * We skip if `versionName` did not change vs. HEAD~1 — so
+#     Dependabot merges, docs-only PRs, refactors, etc. do nothing.
+
+on:
+  push:
+    branches: [master, main]
+  workflow_dispatch:
+    # Manual escape hatch in case a historical bump was missed.
+    inputs:
+      force_version:
+        description: 'Force-tag this versionName (e.g. 1.1.3) without diffing'
+        required: false
+        type: string
+
+concurrency:
+  # Serialise so two merges in quick succession can never race on the
+  # tag namespace. `cancel-in-progress: false` because we want BOTH
+  # pushes to be evaluated — the second one might be the actual bump.
+  group: auto-tag-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write    # create + push the tag
+  actions: write     # dispatch release.yml
+
+jobs:
+  tag:
+    name: Detect version bump and tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          # Need at least HEAD and HEAD~1 so we can diff the gradle
+          # file. `fetch-depth: 2` is enough for the common case of a
+          # single merge commit; if the push contains multiple commits
+          # we still only look at the latest, which is fine for merged
+          # PRs (their last commit is what lands on master).
+          fetch-depth: 2
+          # Default token is OK for reading; writing the tag uses the
+          # same token via `git push`.
+          persist-credentials: true
+
+      - name: Detect versionName change
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          GRADLE_FILE="android/app/build.gradle"
+
+          # The gradle DSL line looks exactly like:
+          #     versionName "1.1.2"
+          # We pull the quoted value out. If the file ever switches
+          # to a single-quoted form we'd need to widen the regex.
+          extract() {
+            grep -oE 'versionName[[:space:]]+"[^"]+"' "$1" \
+              | head -n1 \
+              | sed -E 's/versionName[[:space:]]+"([^"]+)"/\1/'
+          }
+
+          # Manual override path — skip the diff entirely.
+          if [ -n "${{ inputs.force_version }}" ]; then
+            VERSION="${{ inputs.force_version }}"
+            echo "Forcing version: $VERSION"
+            echo "bumped=true"        >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION"   >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NEW=$(extract "$GRADLE_FILE")
+          if [ -z "$NEW" ]; then
+            echo "::error::Could not extract versionName from $GRADLE_FILE"
+            exit 1
+          fi
+
+          # HEAD~1 may not exist on an initial commit. Treat absence
+          # as "previous version unknown" → no bump claim, skip.
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            PREV_CONTENT=$(git show "HEAD~1:$GRADLE_FILE" 2>/dev/null || echo "")
+            if [ -z "$PREV_CONTENT" ]; then
+              OLD=""
+            else
+              OLD=$(echo "$PREV_CONTENT" | grep -oE 'versionName[[:space:]]+"[^"]+"' \
+                | head -n1 \
+                | sed -E 's/versionName[[:space:]]+"([^"]+)"/\1/' || echo "")
+            fi
+          else
+            OLD=""
+          fi
+
+          echo "Previous versionName: '${OLD:-<none>}'"
+          echo "Current  versionName: '$NEW'"
+
+          if [ "$NEW" = "$OLD" ]; then
+            echo "bumped=false" >> "$GITHUB_OUTPUT"
+            echo "No versionName change — skipping tag."
+          else
+            echo "bumped=true"      >> "$GITHUB_OUTPUT"
+            echo "version=$NEW"     >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push tag
+        if: steps.detect.outputs.bumped == 'true'
+        id: tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.detect.outputs.version }}"
+          TAG="v$VERSION"
+
+          # Idempotency: if the tag already points at something we do
+          # nothing. Happens if this workflow is re-run on the same SHA
+          # or if the tag was pushed manually first.
+          if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "$TAG"; then
+            echo "::notice::Tag $TAG already exists on origin — skipping."
+            echo "dispatched=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Annotated tag so it carries a message the Releases UI can
+          # show. We tag at the current commit (the one that landed on
+          # master with the bump), not at HEAD of master at dispatch
+          # time, to avoid any race with a follow-up merge.
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Release $TAG (auto-tagged on versionName bump)"
+          git push origin "$TAG"
+
+          echo "dispatched=true"    >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG"            >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch release.yml at the new tag
+        if: steps.tag.outputs.dispatched == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          VERSION="${{ steps.detect.outputs.version }}"
+          TAG="${{ steps.tag.outputs.tag }}"
+
+          # `gh workflow run` with the default token DOES trigger
+          # workflow_dispatch (unlike push events), so this is how we
+          # bridge from "tag pushed by GITHUB_TOKEN" to "release.yml
+          # actually runs". We pass `--ref $TAG` so the release
+          # workflow checks out the exact commit we tagged.
+          gh workflow run release.yml \
+            --ref "$TAG" \
+            -f "version=$VERSION"
+
+          echo "::notice::Dispatched release.yml at $TAG for version $VERSION."

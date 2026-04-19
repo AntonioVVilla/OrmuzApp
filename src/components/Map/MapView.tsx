@@ -24,6 +24,15 @@ import StationMarker from './StationMarker';
 // so the needle never hides behind the chips.
 const FUEL_CHIP_ROW_BOTTOM_OFFSET = 72;
 
+// The floating `<SearchRadius>` pill sits at `{bottom: 24, left: 12}` with
+// `minHeight: 44 + padding`, so it physically overlaps the MapLibre
+// attribution icon if we leave the icon at its default `{bottom, left}`
+// corner. Worse, the `<SeekBar>` inside the pill intercepts the tap, so
+// users cannot open the attribution dialog at all. Pushing the attribution
+// icon to the opposite corner (bottom-right) keeps it visible and tappable
+// while still satisfying OSM ODbL attribution.
+const ATTRIBUTION_POSITION = {bottom: 8, right: 8} as const;
+
 interface Props {
   stations: Station[];
   userLocation: Coordinate;
@@ -59,7 +68,7 @@ export default function MapView({
         mapStyle={MAP_STYLE_URL}
         logo={false}
         attribution={true}
-        attributionPosition={{bottom: 8, left: 8}}
+        attributionPosition={ATTRIBUTION_POSITION}
         compass={true}
         compassPosition={compassPosition}
         compassHiddenFacingNorth={true}>

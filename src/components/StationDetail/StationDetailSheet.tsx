@@ -1,9 +1,15 @@
 import React, {useCallback, useMemo, useRef} from 'react';
-import {StyleSheet, Text, View, TouchableOpacity, Linking} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import BottomSheet, {BottomSheetScrollView} from '@gorhom/bottom-sheet';
 import {useTranslation} from 'react-i18next';
 import {Station} from '../../types/station';
 import {formatDistance} from '../../utils/formatPrice';
+import {
+  openInGoogleMaps,
+  openInSystemMaps,
+  openInWaze,
+  toNavigationTarget,
+} from '../../utils/navigation';
 import PriceRow from './PriceRow';
 
 interface Props {
@@ -19,19 +25,38 @@ export default function StationDetailSheet({
 }: Props) {
   const {t} = useTranslation();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['35%', '60%'], []);
+  const snapPoints = useMemo(() => ['40%', '65%'], []);
 
-  const handleNavigate = useCallback(() => {
-    if (!station) return;
-    const url = `geo:${station.latitude},${station.longitude}?q=${station.latitude},${station.longitude}(${encodeURIComponent(station.name)})`;
-    Linking.openURL(url).catch(() => {
-      Linking.openURL(
-        `https://www.google.com/maps/dir/?api=1&destination=${station.latitude},${station.longitude}`,
-      );
-    });
-  }, [station]);
+  const navTarget = useMemo(
+    () => (station ? toNavigationTarget(station) : null),
+    [station],
+  );
 
-  if (!station) return null;
+  // Fire-and-forget: the helpers swallow their own rejections and
+  // return Promise<boolean>, so we don't need to await them or handle
+  // failure here. We do ignore the boolean since there is no UI branch
+  // that depends on whether the link resolved to native vs. web.
+  const handleGoogleMaps = useCallback(() => {
+    if (navTarget) {
+      openInGoogleMaps(navTarget).catch(() => undefined);
+    }
+  }, [navTarget]);
+
+  const handleWaze = useCallback(() => {
+    if (navTarget) {
+      openInWaze(navTarget).catch(() => undefined);
+    }
+  }, [navTarget]);
+
+  const handleSystemMaps = useCallback(() => {
+    if (navTarget) {
+      openInSystemMaps(navTarget).catch(() => undefined);
+    }
+  }, [navTarget]);
+
+  if (!station) {
+    return null;
+  }
 
   return (
     <BottomSheet
@@ -84,13 +109,32 @@ export default function StationDetailSheet({
           ))}
         </View>
 
+        <Text style={styles.sectionTitle}>{t('stationDetail.navigate')}</Text>
+        <View style={styles.navRow}>
+          <TouchableOpacity
+            style={[styles.navButton, styles.navButtonGoogle]}
+            onPress={handleGoogleMaps}
+            accessibilityRole="button"
+            accessibilityLabel={t('stationDetail.openInGoogleMaps')}>
+            <Text style={styles.navButtonText}>
+              {t('stationDetail.googleMaps')}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.navButton, styles.navButtonWaze]}
+            onPress={handleWaze}
+            accessibilityRole="button"
+            accessibilityLabel={t('stationDetail.openInWaze')}>
+            <Text style={styles.navButtonText}>{t('stationDetail.waze')}</Text>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
-          style={styles.navButton}
-          onPress={handleNavigate}
+          style={styles.navSecondary}
+          onPress={handleSystemMaps}
           accessibilityRole="button"
-          accessibilityLabel={t('stationDetail.navigate')}>
-          <Text style={styles.navButtonText}>
-            {t('stationDetail.navigate')}
+          accessibilityLabel={t('stationDetail.openInSystemMaps')}>
+          <Text style={styles.navSecondaryText}>
+            {t('stationDetail.systemMaps')}
           </Text>
         </TouchableOpacity>
       </BottomSheetScrollView>
@@ -169,17 +213,43 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 8,
   },
+  navRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
   navButton: {
-    backgroundColor: '#1976D2',
+    flex: 1,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-    minHeight: 44,
+    minHeight: 48,
     justifyContent: 'center',
   },
+  navButtonGoogle: {
+    backgroundColor: '#1976D2',
+  },
+  navButtonWaze: {
+    backgroundColor: '#33CCFF',
+  },
   navButtonText: {
-    color: '#FFF',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 15,
     fontWeight: '700',
+  },
+  navSecondary: {
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+    minHeight: 44,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#CFD8DC',
+    backgroundColor: '#F5F7FA',
+  },
+  navSecondaryText: {
+    color: '#37474F',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

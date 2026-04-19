@@ -39,7 +39,13 @@
     "navigate": "Cómo llegar",
     "close": "Cerrar",
     "schedule": "Horario",
-    "distance": "A {{distance}}"
+    "distance": "A {{distance}}",
+    "googleMaps": "Google Maps",
+    "waze": "Waze",
+    "systemMaps": "Abrir en Mapas del sistema",
+    "openInGoogleMaps": "Abrir en Google Maps",
+    "openInWaze": "Abrir en Waze",
+    "openInSystemMaps": "Abrir en Mapas del sistema"
   },
   "map": {
     "attribution": "© OpenStreetMap · OpenFreeMap",

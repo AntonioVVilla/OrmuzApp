@@ -39,7 +39,13 @@
     "navigate": "Directions",
     "close": "Close",
     "schedule": "Hours",
-    "distance": "{{distance}} away"
+    "distance": "{{distance}} away",
+    "googleMaps": "Google Maps",
+    "waze": "Waze",
+    "systemMaps": "Open in system Maps",
+    "openInGoogleMaps": "Open in Google Maps",
+    "openInWaze": "Open in Waze",
+    "openInSystemMaps": "Open in system Maps"
   },
   "map": {
     "attribution": "© OpenStreetMap · OpenFreeMap",

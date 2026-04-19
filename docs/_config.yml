@@ -1,0 +1,15 @@
+# Minimal Jekyll config so GitHub Pages serves the `/docs` folder as
+# plain static markdown-rendered pages. We deliberately do NOT enable
+# a theme — the files in this folder are landing pages that Google
+# Play Console and users reach directly, not a product site. The
+# default renderer (kramdown + rouge) is enough.
+title: OrmuzApp
+description: >
+  Mapa de precios de gasolineras en España usando datos oficiales del
+  Ministerio de Industria, Comercio y Turismo.
+url: "https://antoniovvilla.github.io"
+baseurl: "/OrmuzApp"
+# Exclude files that are not meant to be served (none currently, but
+# keep the key here so future additions are explicit).
+exclude:
+  - README.md

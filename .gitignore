@@ -66,6 +66,9 @@ yarn-error.log
 # Docker output
 output/
 
+# Local release artifact scratch folder (downloaded APKs, crash logs)
+tmp-apk/
+
 # Environment
 .env
 .env.*

@@ -68,13 +68,23 @@ jobs:
           echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/signing/release.keystore"
           echo "RELEASE_STORE_FILE=$RUNNER_TEMP/signing/release.keystore" >> "$GITHUB_ENV"
 
-      - name: Assemble signed release APK
+      - name: Assemble signed release APK and AAB
         working-directory: android
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
           RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        run: chmod +x gradlew && ./gradlew :app:assembleRelease --no-daemon
+        # We build BOTH formats in a single gradle invocation:
+        #   * APKs (per-ABI split) — published to the GitHub Release
+        #     for side-loading / direct distribution. Keep shipping
+        #     these so `curl | install` still works.
+        #   * AAB  — the required upload format for Google Play
+        #     Console. Play re-signs with the app signing key and
+        #     generates per-device APKs on the fly, so we do NOT
+        #     need to produce split AABs on our side.
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease :app:bundleRelease --no-daemon
 
       - name: Resolve version
         id: version
@@ -93,6 +103,11 @@ jobs:
         run: |
           mkdir -p dist
           cp android/app/build/outputs/apk/release/*.apk dist/
+          # The AAB is emitted under bundle/release/app-release.aab by
+          # default — rename it so the version is on the filename, to
+          # match the APK / mapping / SBOM naming pattern.
+          cp android/app/build/outputs/bundle/release/app-release.aab \
+             "dist/ormuzapp-${{ steps.version.outputs.version }}.aab"
           cp android/app/build/outputs/mapping/release/mapping.txt \
              "dist/mapping-${{ steps.version.outputs.version }}.txt" || true
           ls -la dist/
@@ -135,7 +150,9 @@ jobs:
               detectar tu provincia.
 
             ### Artefactos adjuntos
-            - `*.apk` — binario firmado, uno por ABI.
+            - `*.apk` — binario firmado, uno por ABI (side-load).
+            - `ormuzapp-*.aab` — Android App Bundle para Google Play
+              Console (re-firmado por Play App Signing en el servidor).
             - `mapping-*.txt` — tabla ProGuard para symbolicar
               crash reports.
             - `sbom-*.spdx.json` — Software Bill of Materials
@@ -145,6 +162,7 @@ jobs:
             *Built & signed by GitHub Actions.*
           files: |
             dist/*.apk
+            dist/*.aab
             dist/mapping-*.txt
             dist/sbom-*.spdx.json
           draft: false

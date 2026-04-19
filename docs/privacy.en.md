@@ -9,9 +9,10 @@ permalink: /privacy/en/
 _Last updated: April 19, 2026_
 
 This policy describes how the **OrmuzApp** application ("the app",
-"we") handles information when you use it. The app is published by
-**Gestur Canarias** (contact: <soporte@gesturcanarias.es>) and is
-free software with no advertising, no user accounts and no
+"we") handles information when you use it. The app is maintained by
+an independent developer (Antonio Vera, user
+[`AntonioVVilla`](https://github.com/AntonioVVilla) on GitHub) and
+is free software with no advertising, no user accounts and no
 third-party tracking.
 
 OrmuzApp is a local query client for the public fuel-price catalogue
@@ -103,8 +104,10 @@ time:
 - **Uninstall the app**: removes all local data.
 
 If you still want to contact us about this policy or about the EU
-GDPR, write to <soporte@gesturcanarias.es>. We respond within 30
-calendar days.
+GDPR, open an
+[issue in the repository](https://github.com/AntonioVVilla/OrmuzApp/issues)
+or write to <antoniovvilla@users.noreply.github.com>. We respond
+within 30 calendar days.
 
 ---
 
@@ -137,7 +140,7 @@ Competent supervisory authority: Spanish Data Protection Agency
 
 ## 7. Contact
 
-- **Data controller**: Gestur Canarias
-- **Email**: <soporte@gesturcanarias.es>
+- **Data controller**: Antonio Vera ([`AntonioVVilla`](https://github.com/AntonioVVilla) on GitHub)
+- **Email**: <antoniovvilla@users.noreply.github.com>
 - **Source code**: <https://github.com/AntonioVVilla/OrmuzApp>
 - **Vulnerability disclosure**: see [`SECURITY.md`](https://github.com/AntonioVVilla/OrmuzApp/blob/master/SECURITY.md)

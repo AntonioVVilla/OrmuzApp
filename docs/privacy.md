@@ -9,10 +9,11 @@ permalink: /privacy/
 _Última actualización: 19 de abril de 2026_
 
 Esta política describe cómo la aplicación **OrmuzApp** ("la app",
-"nosotros") trata la información cuando la utilizas. La app está
-publicada por **Gestur Canarias** (contacto:
-<soporte@gesturcanarias.es>) y es software gratuito sin publicidad,
-sin cuentas de usuario y sin seguimiento de terceros.
+"nosotros") trata la información cuando la utilizas. La app la
+mantiene un desarrollador independiente (Antonio Vera, usuario
+[`AntonioVVilla`](https://github.com/AntonioVVilla) en GitHub) y
+es software gratuito sin publicidad, sin cuentas de usuario y sin
+seguimiento de terceros.
 
 OrmuzApp es una consulta local del catálogo público de precios de
 combustible en España, servido por el Ministerio de Industria,
@@ -102,9 +103,10 @@ puedes borrar en cualquier momento:
 - **Desinstalar la app**: elimina todos los datos locales.
 
 Si aun así quieres contactar con nosotros por cualquier cuestión
-relacionada con esta política o con el RGPD, escríbenos a
-<soporte@gesturcanarias.es>. Respondemos en un plazo máximo de 30
-días naturales.
+relacionada con esta política o con el RGPD, abre un
+[issue en el repositorio](https://github.com/AntonioVVilla/OrmuzApp/issues)
+o escríbenos a <antoniovvilla@users.noreply.github.com>. Respondemos
+en un plazo máximo de 30 días naturales.
 
 ---
 
@@ -137,7 +139,7 @@ Datos (<https://www.aepd.es>).
 
 ## 7. Contacto
 
-- **Responsable**: Gestur Canarias
-- **Email**: <soporte@gesturcanarias.es>
+- **Responsable**: Antonio Vera ([`AntonioVVilla`](https://github.com/AntonioVVilla) en GitHub)
+- **Email**: <antoniovvilla@users.noreply.github.com>
 - **Código fuente**: <https://github.com/AntonioVVilla/OrmuzApp>
 - **Informe de vulnerabilidades**: ver [`SECURITY.md`](https://github.com/AntonioVVilla/OrmuzApp/blob/master/SECURITY.md)

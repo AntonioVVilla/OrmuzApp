@@ -20,7 +20,7 @@ Cada sección está calibrada al límite de caracteres que Play impone
 | **Category (primary)** | Maps & Navigation |
 | **Category (secondary)** | Auto & Vehicles |
 | **Tags** (elige hasta 5 en la UI) | Fuel prices · Gas stations · Road trip · Navigation · Spain |
-| **Developer contact — email** | soporte@gesturcanarias.es |
+| **Developer contact — email** | *(rellena en Play Console con el email personal que quieras exponer — Google lo mostrará públicamente y te enviará notificaciones)* |
 | **Developer contact — website** | https://antoniovvilla.github.io/OrmuzApp/ |
 | **Developer contact — phone** | *(opcional; déjalo vacío si prefieres)* |
 | **Privacy policy URL** | https://antoniovvilla.github.io/OrmuzApp/privacy/ |
@@ -109,7 +109,7 @@ Toda la aplicación es software libre publicado en:
 https://github.com/AntonioVVilla/OrmuzApp
 
 Si encuentras un fallo o quieres proponer una mejora, abre una
-issue en el repositorio o escríbenos a soporte@gesturcanarias.es.
+issue en el repositorio.
 
 —
 
@@ -172,7 +172,7 @@ The whole app is free and open-source software published at:
 https://github.com/AntonioVVilla/OrmuzApp
 
 If you find a bug or want to propose an improvement, open an issue
-in the repository or email soporte@gesturcanarias.es.
+in the repository.
 
 —
 

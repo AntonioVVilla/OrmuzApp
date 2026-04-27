@@ -14,7 +14,7 @@
     "check": "npm run lint && npm run typecheck && npm test"
   },
   "dependencies": {
-    "@gorhom/bottom-sheet": "^5.2.9",
+    "@gorhom/bottom-sheet": "^5.2.10",
     "@maplibre/maplibre-react-native": "^11.0.0",
     "@react-native-async-storage/async-storage": "^3.0.2",
     "@react-native/new-app-screen": "0.85.1",

@@ -48,7 +48,7 @@
     "@types/react": "^19.2.0",
     "@types/react-test-renderer": "^19.1.0",
     "eslint": "^8.19.0",
-    "jest": "^30.3.0",
+    "jest": "^30.4.2",
     "prettier": "3.8.3",
     "react-test-renderer": "19.2.3",
     "typescript": "^6.0.3"

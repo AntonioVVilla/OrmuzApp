@@ -55,7 +55,7 @@ jobs:
     name: Detect version bump and tag
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Need at least HEAD and HEAD~1 so we can diff the gradle
           # file. `fetch-depth: 2` is enough for the common case of a

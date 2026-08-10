@@ -121,7 +121,7 @@ jobs:
           upload-artifact: false
 
       - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ormuzapp-release-${{ steps.version.outputs.version }}
           path: dist/
